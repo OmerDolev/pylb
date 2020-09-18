@@ -1,0 +1,3 @@
+# pylb requirements
+flask
+requests
