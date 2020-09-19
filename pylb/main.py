@@ -69,6 +69,7 @@ def get_target() -> Target:
 
 
 if __name__ == '__main__':
+    # TODO: check why target lists are not poopulated
     ipc_manager = multiprocessing.Manager()
     # start checking targets
     prepare_env(ipc_manager)
