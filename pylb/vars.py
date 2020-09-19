@@ -1,7 +1,11 @@
+from os.path import dirname as up
+import os
 # this is a general var list
 targets_pool = []
 healthy_targets = []
-targets_json_file = "../data/init_targets.json"
+targets_json_file = '{0}\data\init_targets.json'.format(up(up(os.path.realpath(__file__))))
+rr_counter = 0
+health_check_interval_seconds = 1
 
 # error and exception handling
 ec_success = 0
