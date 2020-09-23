@@ -3,6 +3,11 @@ import sys
 app = Flask(__name__)
 
 
+@app.route('/', methods=['GET'])
+def root():
+    return "Hello, World!\n", 200
+
+
 # example query "curl -XPOST -H "username: hello" -H "password: wholeworld" http://127.0.0.1:8080/register"
 @app.route('/register', methods=['POST'])
 def register():

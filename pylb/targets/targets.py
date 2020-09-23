@@ -17,9 +17,20 @@ class Target:
             return True
         return False
 
+    def is_in_list(self, t_list):
+        for t in t_list:
+            if is_equal(self, t):
+                return True
+        return False
+
     @staticmethod
     def empty_target():
         return Target("", "")
+
+
+# check if two targets are equal
+def is_equal(first: Target, second: Target):
+    return True if first.host == second.host and first.port == second.port else False
 
 
 # format of json file is expected to be as in ./data/init_targets.json
