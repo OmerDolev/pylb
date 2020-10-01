@@ -12,7 +12,9 @@ app = flask.Flask(__name__)
 
 
 @app.route('/')
-def main():
+@app.route('/<path>')
+def main(path="nopath"):
+    # TODO: handle multiple paths
 
     if flask.request.method == "GET":
         response = handle_get_request(flask.request)
