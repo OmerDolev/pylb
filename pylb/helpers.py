@@ -1,7 +1,5 @@
 import socket
 from targets.targets import *
-import flask
-import requests
 
 
 def is_port_open(target: Target):

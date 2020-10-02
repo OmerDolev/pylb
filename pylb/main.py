@@ -1,5 +1,4 @@
 # imports
-import os
 import time
 import requests
 import vars
@@ -7,7 +6,6 @@ import targets.targets as t
 import helpers
 import flask
 import multiprocessing
-import urllib.error as urllib
 app = flask.Flask(__name__)
 
 
