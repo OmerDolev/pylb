@@ -13,16 +13,6 @@ app = flask.Flask(__name__)
 @app.route('/<path>', methods=['GET', 'POST'])
 def main(path="nopath"):
     # TODO: handle multiple paths
-
-    if flask.request.method == "GET":
-        response = handle_get_request(flask.request)
-    else:
-        response = handle_post_request(flask.request)
-
-    return response
-
-
-def handle_get_request(request: flask.Request):
     target = get_target()
 
     if target.is_empty():
@@ -30,6 +20,15 @@ def handle_get_request(request: flask.Request):
         response.status_code = 500
         return response
 
+    if flask.request.method == "GET":
+        response = handle_get_request(flask.request, target)
+    else:
+        response = handle_post_request(flask.request, target)
+
+    return response
+
+
+def handle_get_request(request: flask.Request, target: t.Target):
     # format target url
     proxy_pass_url = "http://{0}{1}".format(target, request.path)
 
@@ -40,14 +39,7 @@ def handle_get_request(request: flask.Request):
     return r_response.text, r_response.status_code
 
 
-def handle_post_request(request: flask.Request) -> flask.Response:
-    target = get_target()
-
-    if target.is_empty():
-        response = flask.Response(response="No healthy target found")
-        response.status_code = 500
-        return response
-
+def handle_post_request(request: flask.Request, target: t.Target) -> flask.Response:
     # format target url
     proxy_pass_url = "http://{0}{1}".format(target, request.path)
 
