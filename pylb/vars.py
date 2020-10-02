@@ -2,10 +2,7 @@ from os.path import dirname as up
 import os
 import sys
 
-# this is a general var list
-targets_pool = []
-healthy_targets = []
-rr_counter = 0
+# this is a general RO var list
 health_check_interval_seconds = 1
 
 if sys.executable.endswith("exe"):

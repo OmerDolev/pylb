@@ -12,17 +12,14 @@ app = flask.Flask(__name__)
 
 
 @app.route('/')
-@app.route('/<path>')
+@app.route('/<path>', methods=['GET', 'POST'])
 def main(path="nopath"):
     # TODO: handle multiple paths
 
     if flask.request.method == "GET":
         response = handle_get_request(flask.request)
-    elif flask.request.method == "POST":
-        response = handle_post_request(flask.request)
     else:
-        response = flask.Response(response="LB does not support the request method")
-        response.status_code = 400
+        response = handle_post_request(flask.request)
 
     return response
 
@@ -36,7 +33,7 @@ def handle_get_request(request: flask.Request):
         return response
 
     # format target url
-    proxy_pass_url = "http://{0}{1}".format(get_target(), request.path)
+    proxy_pass_url = "http://{0}{1}".format(target, request.path)
 
     try:
         r_response = requests.get(url=proxy_pass_url, headers=request.headers)
@@ -46,7 +43,21 @@ def handle_get_request(request: flask.Request):
 
 
 def handle_post_request(request: flask.Request) -> flask.Response:
-    return requests.post("")
+    target = get_target()
+
+    if target.is_empty():
+        response = flask.Response(response="No healthy target found")
+        response.status_code = 500
+        return response
+
+    # format target url
+    proxy_pass_url = "http://{0}{1}".format(target, request.path)
+
+    try:
+        r_response = requests.post(url=proxy_pass_url, headers=request.headers)
+    except RuntimeError as e:
+        terminate(vars.ec_runtime_error)
+    return r_response.text, r_response.status_code
 
 
 @app.route('/targets')
@@ -66,12 +77,14 @@ def terminate(exit_code: int):
     exit(exit_code)
 
 
+# round-robin targets for requests
 def get_target() -> t.Target:
+    global rr_counter
     if not healthy_targets:
         return t.Target.empty_target()
 
-    selected_target = healthy_targets[vars.rr_counter]
-    vars.rr_counter = (vars.rr_counter+1) % len(healthy_targets)
+    selected_target = healthy_targets[rr_counter]
+    rr_counter = (rr_counter+1) % len(healthy_targets)
     return selected_target
 
 
@@ -91,9 +104,11 @@ def update_healthy_targets_list(t_pool, h_targets):
 
 if __name__ == '__main__':
 
+    # muttable variables in global scope
     ipc_manager = multiprocessing.Manager()
     targets_pool = ipc_manager.list()
     healthy_targets = ipc_manager.list()
+    rr_counter = 0
 
     t.populate_target_list_from_json(vars.targets_json_file)
     for tgt in t.Target.targetList:
